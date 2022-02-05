@@ -53,9 +53,9 @@ def delete_posts(id):
     conn.commit()
     conn.close()
 
-def registration_user(name, password):
-    connUsers = get_db_connection_users()
-    connUsers.execute('INSERT INTO users (name, password) VALUES (?, ?)',
-                      (name, password))
-    connUsers.commit()
-    connUsers.close()
+def add_user(name, email, password):
+    conn = get_db_connection_users()
+    conn.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+                 (name, email, password))
+    conn.commit()
+    conn.close()

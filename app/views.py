@@ -1,8 +1,9 @@
 from flask import render_template, request, url_for, flash, redirect
 
 from app import app
+from app.forms import User_registration_form
 
-from app.repositories import get_all_posts, get_post, add_posts, update_posts, delete_posts, registration_user#, like_posts
+from app.repositories import get_all_posts, get_post, add_posts, update_posts, delete_posts, add_user
 @app.route('/')
 def draw_main_page():
     posts= get_all_posts()
@@ -48,18 +49,23 @@ def edit(id):
     return render_template('edit.html', post=post)
 
 
-@app.route('/registration', methods= ('GET', 'POST'))
-def registration():
-    if request.method == 'POST':
-        name = request.form['name']
-        password = request.form['password']
+@app.route('/register/', methods=['get', 'post'])
+def register_user():
+    form = User_registration_form()
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        password = form.password.data
+        password_again = form.passwordRepeatFieled.data
 
-        if not name or not password:
-            flash('Заполните все поля!')
+        if password != password_again:
+            flash('Enter equal passwords!')
         else:
-            registration_user(name, password)
+            print(f'{name} {email}')
+            add_user(name, email, password)
             return redirect(url_for('draw_main_page'))
-    return render_template('registration.html')
+
+    return render_template('registration.html', form=form)
 
 @app.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
