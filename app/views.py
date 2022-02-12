@@ -1,7 +1,7 @@
 from flask import render_template, request, url_for, flash, redirect
 
 from app import app
-from app.forms import User_registration_form, Post_create_form
+from app.forms import User_registration_form
 
 from app.alchemy_repositories import get_all_posts, get_post, update_posts, delete_posts, add_user, add_posts
 
@@ -23,14 +23,17 @@ def post(post_id):
 
 @app.route('/create', methods= ('GET', 'POST'))
 def create():
-    form = Post_create_form()
-    if form.validate_on_submit():
-        title = form.title.data
-        content = form.content.data
-        add_posts(title, content)
-        return redirect(url_for('draw_main_page'))
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
 
-    return render_template('create.html', form=form)
+        if not title:
+            flash('Введите заголовок!')
+        else:
+            add_posts(title, content)
+            return redirect(url_for('draw_main_page'))
+
+    return render_template('create.html')
 
 @app.route('/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
