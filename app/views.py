@@ -1,9 +1,10 @@
 from flask import render_template, request, url_for, flash, redirect
 
 from app import app
-from app.forms import User_registration_form
+from app.forms import User_registration_form, Post_create_form
 
-from app.repositories import get_all_posts, get_post, add_posts, update_posts, delete_posts, add_user
+from app.alchemy_repositories import get_all_posts, get_post, update_posts, delete_posts, add_user, add_posts
+
 @app.route('/')
 def draw_main_page():
     posts= get_all_posts()
@@ -18,19 +19,18 @@ def post(post_id):
     post = get_post(post_id)
     return render_template('post.html', post=post)
 
+
+
 @app.route('/create', methods= ('GET', 'POST'))
 def create():
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
+    form = Post_create_form()
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+        add_posts(title, content)
+        return redirect(url_for('draw_main_page'))
 
-        if not title:
-            flash('Введите заголовок!')
-        else:
-            add_posts(title, content)
-            return redirect(url_for('draw_main_page'))
-
-    return render_template('create.html')
+    return render_template('create.html', form=form)
 
 @app.route('/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
@@ -71,14 +71,3 @@ def register_user():
 def delete(id):
     delete_posts(id)
     return redirect(url_for('draw_main_page'))
-
-
-'''@app.route('/<int:id>/like', methods=('POST',))
-def like(id):
-    like_posts(id)
-    return redirect(url_for('draw_main_page'))
-
-
-if __name__ == '__main__':
-    app.run()
-'''

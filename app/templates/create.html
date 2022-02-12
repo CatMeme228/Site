@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
 
+<h1>{% block title %} "Create new post" {% endblock %}</h1>
+
 {% block content %}
-<h1>{% block title %} Create a New Post {% endblock %}</h1>
 
-<form method="post">
-    <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" name="title"
-               placeholder="Post title" class="form-control"
-               value="{{ request.form['title'] }}"></input>
-    </div>
+<form action="" method="post">
 
-    <div class="form-group">
-        <label for="content">Content</label>
-        <textarea name="content" placeholder="Post content"
-                  class="form-control">{{ request.form['content'] }}</textarea>
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+    {{ form.csrf_token() }}
+
+    {% for field in form if field.name != "csrf_token" %}
+  <p>{{ field.label() }}</p>
+  <p>{{ field }}
+      {% for error in field.errors %}
+    {{ error }}
+      {% endfor %}
+  </p>
+    {% endfor %}
+
 </form>
+
+
 {% endblock %}
