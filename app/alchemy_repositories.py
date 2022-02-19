@@ -1,7 +1,7 @@
 from sqlalchemy import update
 from app.models import db
 from flask_sqlalchemy import SQLAlchemy
-from app.models import Post, User
+from app.models import Post, User, Comment
 
 
 
@@ -33,3 +33,14 @@ def add_user(user_name, email, userpassword):
     new_post = User(user_name= user_name, email=email, userpassword=userpassword)
     db.session.add(new_post)
     db.session.commit()
+
+def add_comment(post_id, content):
+    post = get_post(post_id)
+    new_comment = Comment(post=post, content=content)
+    db.session.add(new_comment)
+    db.session.commit()
+
+def get_comments(post_id):
+    post = Post.query.get(post_id)
+    comments = post.comments.all()
+    return comments

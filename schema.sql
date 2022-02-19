@@ -11,3 +11,10 @@ CREATE TABLE IF NOT EXISTS users(
     email TEXT NOT NULL,
     userpassword TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS comments(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
+    content TEXT NOT NULL,
+    post_id INTEGER NOT NULL
+);
