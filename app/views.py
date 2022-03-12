@@ -1,11 +1,15 @@
 from os import abort
 
 from flask import render_template, request, url_for, flash, redirect
+from flask_login import login_required, login_user, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import app
-from app.forms import User_registration_form, Comment_creation_form
+from app.forms import User_registration_form, Comment_creation_form, User_login_form
 
-from app.alchemy_repositories import get_all_posts, get_post, update_posts, delete_posts, add_user, add_posts, add_comment, get_comments
+from app.alchemy_repositories import get_all_posts, get_post, update_posts, delete_posts, add_user, add_posts, \
+    add_comment, get_comments, load_user_by_name
+
 
 @app.route('/')
 def draw_main_page():
@@ -70,11 +74,42 @@ def register_user():
         if password != password_again:
             flash('Enter equal passwords!')
         else:
+            password_hash = generate_password_hash(password)
             print(f'{name} {email}')
-            add_user(name, email, password)
+            add_user(name, email, password_hash)
             return redirect(url_for('draw_main_page'))
 
     return render_template('registration.html', form=form)
+
+@app.route('/login/', methods= ['post', 'get'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('/personal_cabinet/'))
+    form= User_login_form()
+
+    if form.validate_on_submit():
+        user = load_user_by_name(form.name.data)
+        print(user)
+
+        if user and check_password_hash(user.password_hash, form.password.data):
+            login_user(user, remember=True)
+            return redirect(url_for('personal_cabinet'))
+
+    return render_template('login.html', form = form)
+
+@app.route('/logout/')
+@login_required
+def logout():
+    logout_user()
+    flash('You loggerd out')
+    return redirect(url_for('login'))
+
+
+@app.route('/personal_cabinet/')
+@login_required
+def personal_cabinet():
+    return render_template('personal.html', user= current_user)
+
 
 @app.route('/<int:post_id>/comments/create', methods=('GET', 'POST'))
 def create_comment(post_id):
