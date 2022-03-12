@@ -1,0 +1,11 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} My account {% endblock %}</h1>
+    <ul>
+        <li>Username: {{ user.user_name }}</li>
+        <li>Email: {{ user.email }}</li>
+        <li>Created: {{ user.created }}</li>
+    </ul>
+    <p><a href="{{ url_for('logout') }}">Logout</a></p>
+{% endblock %}
