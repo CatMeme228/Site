@@ -84,7 +84,7 @@ def register_user():
 @app.route('/login/', methods= ['post', 'get'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('/personal_cabinet/'))
+        return redirect(url_for('personal_cabinet'))
     form= User_login_form()
 
     if form.validate_on_submit():
